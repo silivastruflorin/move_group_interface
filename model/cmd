@@ -1,0 +1,130 @@
+TRAJECTORY CONTROLLER:
+
+  - positions comands for JointTrajectory controller  
+
+      ign topic -t "/model/ur5_rg2/joint_trajectory" -m ignition.msgs.JointTrajectory -p '
+          joint_names: "shoulder_pan_joint"
+          joint_names: "shoulder_lift_joint"
+          joint_names: "elbow_joint"
+          joint_names: "wrist_1_joint"
+          joint_names: "wrist_2_joint"
+          points {
+            positions: -0.7854
+            positions: 0.5708
+            positions: -0.7854
+            positions: 0.5708
+            positions: -0.7854
+            time_from_start {
+              sec: 10
+              nsec: 0
+            }
+          }
+          points {
+            positions: -1.7854
+            positions: 1.5708
+            positions: -1.7854
+            positions: 1.5708
+            positions: -1.7854
+            time_from_start {
+              sec: 20
+              nsec: 0
+            }
+          }'
+
+
+  - velocities comands for JointTrajectory controller  
+      ex:  points {
+            positions: ${POS1}
+            positions: ${POS2}
+            velocities: ${VEL1}
+            velocities: ${VEL2}
+            effort: ${EFF1}
+            effort: ${EFF2}
+            time_from_start {
+              sec: ${SEC}
+              nsec: ${NSEC}
+            }
+          }
+
+
+      ign topic -t "/model/ur5_rg2/joint_trajectory" -m ignition.msgs.JointTrajectory -p '
+          joint_names: "shoulder_pan_joint"
+          joint_names: "shoulder_lift_joint"
+          joint_names: "elbow_joint"
+          joint_names: "wrist_1_joint"
+          joint_names: "wrist_2_joint"
+
+          points {
+            positions: -0.7854
+            positions: 0.5708
+            positions: -0.7854
+            positions: 0.5708
+            positions: -0.7854
+            velocities: 0.03
+            velocities: 0.03
+            velocities: 0.03
+            velocities: 0.03
+            velocities: 0.03
+            time_from_start {
+              sec: 10
+              nsec: 0
+            }
+          }
+
+          points {
+            positions: 0.0
+            positions: 0.0
+            positions: 0.0
+            positions: 0.0
+            positions: 0.0
+            velocities: 2.0
+            velocities: 2.0
+            velocities: 2.0
+            velocities: 2.0
+            velocities: 2.0
+            time_from_start {
+              sec: 20
+              nsec: 0
+            }
+          }'
+
+
+
+POSITION CONTROLLER:
+
+  - comands for position controller:
+    default topic /model/<model_name>/joint/<joint_name >/<joint_number>/cmd_pos
+
+    ign topic -t "/model/ur5_rg2/joint/shoulder_pan_joint/0/cmd_pos" -m ignition.msgs.Double -p 'data: 4.0' 
+    ign topic -t "/model/ur5_rg2/joint/shoulder_lift_joint/0/cmd_pos" -m ignition.msgs.Double -p 'data: 1.0'
+    ign topic -t "/model/ur5_rg2/joint/elbow_joint/0/cmd_pos" -m ignition.msgs.Double -p 'data: 1.0'
+    ign topic -t "/model/ur5_rg2/joint/wrist_2_joint/0/cmd_pos" -m ignition.msgs.Double -p 'data: 1.0'
+    ign topic -t "/model/ur5_rg2/joint/wrist_1_joint/0/cmd_pos" -m ignition.msgs.Double -p 'data: 1.0'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Subscribers:
+Progress of each trajectory can then be tracked by subscribing to the corresponding topic:
+
+ign topic -e -t "/model/ur5_rg2/joint_trajectory_progress"
+
+
+JOINT STATES PUBLISHER
+/world/<world_name>/model/<model_name>/joint_state
+
+
+ign topic -e -t "/world/arm_robot_world/model/ur5_rg2/joint_state"
