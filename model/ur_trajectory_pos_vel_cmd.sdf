@@ -45,10 +45,6 @@
             name="ignition::gazebo::systems::SceneBroadcaster">
     </plugin>
 
-   
-
-
-    
 
     <model name='ur5_rg2'>
       <joint name='ur5_rg2_joint_world' type='fixed'>
@@ -734,7 +730,6 @@
         <joint_name>rg2_finger_joint1</joint_name> 
         <joint_name>rg2_finger_joint2</joint_name> 
       </plugin>
-
 
     </model>
   </world>

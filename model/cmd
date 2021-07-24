@@ -128,3 +128,6 @@ JOINT STATES PUBLISHER
 
 
 ign topic -e -t "/world/arm_robot_world/model/ur5_rg2/joint_state"
+
+
+

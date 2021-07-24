@@ -74,9 +74,9 @@ def generate_launch_description():
     )
     ompl_planning_pipeline_config["move_group"].update(ompl_planning_yaml)
 
-    # # Trajectory Execution Functionality
+    # Trajectory Execution Functionality
     moveit_simple_controllers_yaml = load_yaml(
-        "move_group_interface", "config/ros_controllers.yaml"
+        "move_group_interface", "config/panda_ros_controller.yaml"
     )
     moveit_controllers = {
         "moveit_simple_controller_manager": moveit_simple_controllers_yaml,
@@ -97,22 +97,7 @@ def generate_launch_description():
         "publish_transforms_updates": True,
     }
 
-    # Start the actual move_group node/action server
-    run_move_group_node = Node(
-        package="moveit_ros_move_group",
-        executable="move_group",
-        output="screen",
-        parameters=[
-            robot_description,
-            robot_description_semantic,
-            kinematics_yaml,
-            ompl_planning_pipeline_config,
-            trajectory_execution,
-            # moveit_controllers,
-            planning_scene_monitor_parameters,
-        ],
-    )
-
+   
   
     # # Publish TF
     robot_state_publisher = Node(
@@ -124,6 +109,7 @@ def generate_launch_description():
     )
 
 
+    use_sim_time = LaunchConfiguration('use_sim_time', default=True)
 
     ign_gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -133,14 +119,53 @@ def generate_launch_description():
         }.items(),
     )
 
-    # Bridge
-    bridge = Node(
+    # Bridge IGN -> ROS2
+    bridge_Clock = Node(
         package='ros_ign_bridge',
         executable='parameter_bridge',
+        name='parameter_bridge_block',
+        output='screen',
+        arguments=['/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock','--ros-args'],
+        parameters=[{'use_sim_time': use_sim_time}]
+         )
+
+
+
+    # Bridge IGN -> ROS2
+    bridge_JointState = Node(
+        package='ros_ign_bridge',
+        executable='parameter_bridge',
+        name='ign_bridge_joint_states',
         arguments=['/world/arm_robot_world/model/ur5_rg2/joint_state@sensor_msgs/msg/JointState@ignition.msgs.Model',  #receive joint states from ignition
                    ],
         output='screen',
-        remappings=[("/world/arm_robot_world/model/ur5_rg2/joint_state","/joint_states")] #change the name of the topic(imposed by ign jointStatePublishe to /joint_states so the robot_state_publisher cand read it)
+        parameters=[{'use_sim_time': use_sim_time}],
+        remappings=[("/world/arm_robot_world/model/ur5_rg2/joint_state","/joint_states")] 
+    )
+
+
+    # Bridge ROS2 -> IGN
+    bridge_JointTrajectory = Node(
+        package='ros_ign_bridge',
+        executable='parameter_bridge',
+        name='ign_bridge_joint_trajectory',
+        arguments=['/model/ur5_rg2/joint_trajectory@trajectory_msgs/msg/JointTrajectory@ignition.msgs.JointTrajectory'
+                   ],
+        output='screen',
+        parameters=[{'use_sim_time': use_sim_time}],
+        remappings=[("/model/ur5_rg2/joint_trajectory","/joint_trajectory")]  
+    )
+
+    # Bridge IGN -> ROS2
+    bridge_Joint_trajectory_progress= Node(
+        package='ros_ign_bridge',
+        executable='parameter_bridge',
+        name='ign_bridge_Joint_trajectory_progress',
+        arguments=['/model/ur5_rg2/joint_trajectory_progress@std_msgs/msg/Float32[ignition.msgs.Float',  #receive joint states from ignition
+                   ],
+        output='screen',
+        parameters=[{'use_sim_time': use_sim_time}],
+        remappings=[("/model/ur5_rg2/joint_trajectory_progress","/joint_trajectory_progress")] 
     )
 
       # RViz
@@ -150,7 +175,7 @@ def generate_launch_description():
     rviz_node = Node(
         package="rviz2",
         executable="rviz2",
-        name="rviz2",
+        name="rviz2_node",
         output="log",
         arguments=["-d", rviz_config_file],
         parameters=[
@@ -170,63 +195,57 @@ def generate_launch_description():
         arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "world_link", "base_link"],
     )
 
+     # Start the actual move_group node/action server
+    run_move_group_node = Node(
+        package="moveit_ros_move_group",
+        executable="move_group",
+        output="screen",
+        parameters=[
+            robot_description,
+            robot_description_semantic,
+            kinematics_yaml,
+            ompl_planning_pipeline_config,
+            trajectory_execution,
+            moveit_controllers,
+            planning_scene_monitor_parameters,
+            {'use_sim_time': use_sim_time},
+        ],
+    )
 
-    # # ros2_control using FakeSystem as hardware
-    # ros2_controllers_path = os.path.join(
-    #     get_package_share_directory("moveit_resources_panda_moveit_config"),
-    #     "config",
-    #     "panda_ros_controllers.yaml",
-    # )
-    # ros2_control_node = Node(
-    #     package="controller_manager",
-    #     executable="ros2_control_node",
-    #     parameters=[robot_description, ros2_controllers_path],
-    #     output={
-    #         "stdout": "screen",
-    #         "stderr": "screen",
-    #     },
-    # )
+    ros_action_server = Node(
+        package="action_ros_server_for_moveit",
+        executable="action_server_exe",
+        name="ros_action_server",
+        output="screen",
+    )
 
 
 
-    # # Load controllers
-    # load_controllers = []
-    # for controller in [
-    #     "panda_arm_controller",
-    #     "panda_hand_controller",
-    #     "joint_state_controller",
-    # ]:
-    #     load_controllers += [
-    #         ExecuteProcess(
-    #             cmd=["ros2 run controller_manager spawner.py {}".format(controller)],
-    #             shell=True,
-    #             output="screen",
-    #         )
-    #     ]
-
-    # # Warehouse mongodb server
-    # mongodb_server_node = Node(
-    #     package="warehouse_ros_mongo",
-    #     executable="mongo_wrapper_ros.py",
-    #     parameters=[
-    #         {"warehouse_port": 33829},
-    #         {"warehouse_host": "localhost"},
-    #         {"warehouse_plugin": "warehouse_ros_mongo::MongoDatabaseConnection"},
-    #     ],
-    #     output="screen",
-    # )
+    # Warehouse mongodb server
+    mongodb_server_node = Node(
+        package="warehouse_ros_mongo",
+        executable="mongo_wrapper_ros.py",
+        parameters=[
+            {"warehouse_port": 33829},
+            {"warehouse_host": "localhost"},
+            {"warehouse_plugin": "warehouse_ros_mongo::MongoDatabaseConnection"},
+        ],
+        output="screen",
+    )
 
     return LaunchDescription(
         [
             
             static_tf,
             robot_state_publisher,
-            bridge,
             ign_gazebo,
+            bridge_JointState,
+            bridge_JointTrajectory,
+            bridge_Joint_trajectory_progress,
+            bridge_Clock,
             rviz_node,
             run_move_group_node,
-            #ros2_control_node,
+            ros_action_server,
             #mongodb_server_node,
         ]
-        # + load_controllers
     )
