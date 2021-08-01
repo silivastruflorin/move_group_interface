@@ -222,10 +222,10 @@
 
 
   <!-- End-effector -->
-  <!-- <link name="tool0"/>
+  <link name="tool0"/>
   <joint name="end_effector_frame_fixed_joint" type="fixed">
     <parent link="wrist_3_link"/>
     <child link="tool0"/>
     <origin xyz="0 0.275 0" rpy="-1.570796325 0 0"/>
-  </joint> -->
+  </joint>
 </robot>

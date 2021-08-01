@@ -47,6 +47,7 @@ def generate_launch_description():
     robot_description_config = load_file(
         "move_group_interface", "urdf/ur5_rg2.urdf.xml"
     )
+    
     robot_description = {"robot_description": robot_description_config}
 
     robot_description_semantic_config = load_file(
@@ -97,7 +98,7 @@ def generate_launch_description():
         "publish_transforms_updates": True,
     }
 
-   
+    use_sim_time = LaunchConfiguration('use_sim_time', default=True)
   
     # # Publish TF
     robot_state_publisher = Node(
@@ -105,11 +106,11 @@ def generate_launch_description():
         executable="robot_state_publisher",
         name="robot_state_publisher",
         output="both",
-        parameters=[robot_description],
+        parameters=[robot_description,{'use_sim_time':use_sim_time}],
     )
 
 
-    use_sim_time = LaunchConfiguration('use_sim_time', default=True)
+    
 
     ign_gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -123,10 +124,10 @@ def generate_launch_description():
     bridge_Clock = Node(
         package='ros_ign_bridge',
         executable='parameter_bridge',
-        name='parameter_bridge_block',
+        name='parameter_bridge_Clock',
         output='screen',
         arguments=['/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock','--ros-args'],
-        parameters=[{'use_sim_time': use_sim_time}]
+        # parameters=[{'use_sim_time': use_sim_time}]
          )
 
 
@@ -136,7 +137,7 @@ def generate_launch_description():
         package='ros_ign_bridge',
         executable='parameter_bridge',
         name='ign_bridge_joint_states',
-        arguments=['/world/arm_robot_world/model/ur5_rg2/joint_state@sensor_msgs/msg/JointState@ignition.msgs.Model',  #receive joint states from ignition
+        arguments=['/world/arm_robot_world/model/ur5_rg2/joint_state@sensor_msgs/msg/JointState[ignition.msgs.Model',  #receive joint states from ignition
                    ],
         output='screen',
         parameters=[{'use_sim_time': use_sim_time}],
@@ -192,6 +193,7 @@ def generate_launch_description():
         executable="static_transform_publisher",
         name="static_transform_publisher",
         output="log",
+        parameters=[{'use_sim_time': use_sim_time}],
         arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "world_link", "base_link"],
     )
 
@@ -199,6 +201,7 @@ def generate_launch_description():
     run_move_group_node = Node(
         package="moveit_ros_move_group",
         executable="move_group",
+        name="move_group_node",
         output="screen",
         parameters=[
             robot_description,
@@ -234,15 +237,14 @@ def generate_launch_description():
     )
 
     return LaunchDescription(
-        [
-            
-            static_tf,
+        [   
             robot_state_publisher,
-            ign_gazebo,
+            static_tf,
             bridge_JointState,
             bridge_JointTrajectory,
             bridge_Joint_trajectory_progress,
             bridge_Clock,
+            ign_gazebo,
             rviz_node,
             run_move_group_node,
             ros_action_server,

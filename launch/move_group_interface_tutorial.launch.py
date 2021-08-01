@@ -3,7 +3,7 @@ import yaml
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
-
+from launch.substitutions import LaunchConfiguration
 
 def load_file(package_name, file_path):
     package_path = get_package_share_directory(package_name)
@@ -46,14 +46,17 @@ def generate_launch_description():
     )
     robot_description_kinematics = {"robot_description_kinematics": kinematics_yaml}
 
+    use_sim_time = LaunchConfiguration('use_sim_time', default=True)
+
     # MoveGroupInterface demo executable
     move_group_demo = Node(
-        name="move_group_interface_tutorial",
+        name="move_group_interface_node",
         package="move_group_interface",
         executable="move_group_interface_tutorial_exe",
         prefix="xterm -e",
         output="screen",
-        parameters=[robot_description, robot_description_semantic, kinematics_yaml],
+        parameters=[robot_description, robot_description_semantic, kinematics_yaml,{'use_sim_time': use_sim_time},],
+        remappings=[("/move_group_interface_node_name_space/joint_states","/joint_states")],
     )
 
     return LaunchDescription([move_group_demo])
