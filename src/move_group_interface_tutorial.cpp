@@ -202,16 +202,13 @@ int main(int argc, char** argv)
 
   // /* Uncomment below line when working with a real robot */
   move_group.move(); 
-  prompt("wait");
-  // // Planning to a joint-space goal
-  // // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   // //
   // // Let's set a joint space goal and move towards it.  This will replace the
   // // pose target we set above.
   // //
   // // To start, we'll create an pointer that references the current robot's state.
   // // RobotState is the object that contains all the current position/velocity/acceleration data.
-  // moveit::core::RobotStatePtr current_state = move_group.getCurrentState(10);
+  // moveit::core::RobotStatePtr current_state = move_group.getCurrentState(10);  
   // //
   // // Next get the current set of joint values for the group.
   // std::vector<double> joint_group_positions;
