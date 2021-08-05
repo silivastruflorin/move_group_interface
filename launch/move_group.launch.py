@@ -278,7 +278,7 @@ def generate_launch_description():
     return LaunchDescription(
 <<<<<<< Updated upstream
         [
-            
+             
 =======
         [   
             ign_gazebo,
@@ -297,7 +297,6 @@ def generate_launch_description():
             ros_action_server_arm,
             ros_action_server_gripper,
             run_move_group_node,
-           
             #mongodb_server_node,
         ]
     )
