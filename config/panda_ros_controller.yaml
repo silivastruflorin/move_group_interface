@@ -1,6 +1,13 @@
 controller_names:
   - ur5_controller
 
+  # - panda_hand_controller
+
+  - hand_controller
+
+
+  # - panda_hand_controller
+
 ur5_controller:
   action_ns: follow_joint_trajectory
   type: FollowJointTrajectory
@@ -14,3 +21,18 @@ ur5_controller:
    - wrist_3_joint
 
 
+
+hand_controller:
+  action_ns: follow_joint_trajectory
+  type: FollowJointTrajectory
+  default: true
+  joints:
+   - rg2_finger_joint1
+   - rg2_finger_joint2
+
+# panda_hand_controller:
+#   action_ns: gripper_cmd
+#   type: GripperCommand
+#   default: true
+#   joints:
+#     - panda_finger_joint1
