@@ -145,51 +145,27 @@ def generate_launch_description():
 
 
     # Bridge ROS2 -> IGN
-    bridge_arm_JointTrajectory = Node(
+    bridge_JointTrajectory = Node(
         package='ros_ign_bridge',
         executable='parameter_bridge',
-        name='ign_bridge_arm_joint_trajectory',
-        arguments=['/model/ur5_rg2/arm_controller@trajectory_msgs/msg/JointTrajectory@ignition.msgs.JointTrajectory'
+        name='ign_bridge_joint_trajectory',
+        arguments=['/model/ur5_rg2/joint_trajectory@trajectory_msgs/msg/JointTrajectory@ignition.msgs.JointTrajectory'
                    ],
         output='screen',
         parameters=[{'use_sim_time': use_sim_time}],
-        remappings=[("/model/ur5_rg2/arm_controller","/arm_joint_trajectory")]  
-    )
-
-    # Bridge ROS2 -> IGN
-    bridge_gripper_JointTrajectory = Node(
-        package='ros_ign_bridge',
-        executable='parameter_bridge',
-        name='ign_bridge_gripper_joint_trajectory',
-        arguments=['/model/ur5_rg2/gripper_controller@trajectory_msgs/msg/JointTrajectory@ignition.msgs.JointTrajectory'
-                   ],
-        output='screen',
-        parameters=[{'use_sim_time': use_sim_time}],
-        remappings=[("/model/ur5_rg2/gripper_controller","/gripper_joint_trajectory")]  
+        remappings=[("/model/ur5_rg2/joint_trajectory","/joint_trajectory")]  
     )
 
     # Bridge IGN -> ROS2
-    bridge_arm_Joint_trajectory_progress= Node(
+    bridge_Joint_trajectory_progress= Node(
         package='ros_ign_bridge',
         executable='parameter_bridge',
-        name='ign_bridge_arm_Joint_trajectory_progress',
-        arguments=['/model/ur5_rg2/arm_controller_progress@std_msgs/msg/Float32[ignition.msgs.Float',  #receive joint states from ignition
+        name='ign_bridge_Joint_trajectory_progress',
+        arguments=['/model/ur5_rg2/joint_trajectory_progress@std_msgs/msg/Float32[ignition.msgs.Float',  #receive joint states from ignition
                    ],
         output='screen',
         parameters=[{'use_sim_time': use_sim_time}],
-        remappings=[("/model/ur5_rg2/arm_controller_progress","/arm_controller_progress")] 
-    )
-
-    # Bridge IGN -> ROS2
-    bridge_gripper_Joint_trajectory_progress= Node(
-        package='ros_ign_bridge',
-        executable='parameter_bridge',
-        name='ign_bridge_gripper_Joint_trajectory_progress',
-        arguments=['/model/ur5_rg2/hand_controller_progress@std_msgs/msg/Float32[ignition.msgs.Float',  #receive joint states from ignition
-                   ],
-        output='screen',
-        parameters=[{'use_sim_time': use_sim_time}],
-        remappings=[("/model/ur5_rg2/hand_controller_progress","/hand_controller_progress")] 
+        remappings=[("/model/ur5_rg2/joint_trajectory_progress","/joint_trajectory_progress")] 
     )
 
       # RViz
@@ -236,26 +212,11 @@ def generate_launch_description():
         ],
     )
 
-    ros_action_server_arm = Node(
+    ros_action_server = Node(
         package="action_ros_server_for_moveit",
         executable="action_server_exe",
-        name="ros_action_server_arm",
+        name="ros_action_server",
         output="screen",
-        parameters=[{"action_name": "ur5_controller/follow_joint_trajectory"}], #set the name of the action server which will connect to moveit action client
-        remappings=[("/joint_trajectory","/arm_joint_trajectory"),
-                     ("/joint_trajectory_progress","/arm_controller_progress")
-                    ],
-    )
-
-    ros_action_server_gripper = Node(
-        package="action_ros_server_for_moveit",
-        executable="action_server_exe",
-        name="ros_action_server_gripper",
-        output="screen",
-        parameters=[{"action_name": "hand_controller/follow_joint_trajectory"}],
-        remappings=[("/joint_trajectory","/gripper_joint_trajectory"),
-                    ("/joint_trajectory_progress","/hand_controller_progress")
-                   ], 
     )
 
 
@@ -273,22 +234,27 @@ def generate_launch_description():
     )
 
     return LaunchDescription(
+<<<<<<< HEAD
         [   
             ign_gazebo,
             robot_state_publisher,
+=======
+        [
+            
+>>>>>>> parent of 160c356 (v2 update)
             static_tf,
             robot_state_publisher,
             ign_gazebo,
             bridge_JointState,
-            bridge_arm_JointTrajectory,
-            bridge_gripper_JointTrajectory,
-            bridge_arm_Joint_trajectory_progress,
-            bridge_gripper_Joint_trajectory_progress,
+            bridge_JointTrajectory,
+            bridge_Joint_trajectory_progress,
             bridge_Clock,
             rviz_node,
-            ros_action_server_arm,
-            ros_action_server_gripper,
             run_move_group_node,
+<<<<<<< HEAD
+=======
+            ros_action_server,
+>>>>>>> parent of 160c356 (v2 update)
             #mongodb_server_node,
         ]
     )
