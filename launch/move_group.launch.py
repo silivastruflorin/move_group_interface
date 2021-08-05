@@ -126,10 +126,7 @@ def generate_launch_description():
         name='parameter_bridge_block',
         output='screen',
         arguments=['/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock','--ros-args'],
-<<<<<<< Updated upstream
         parameters=[{'use_sim_time': use_sim_time}]
-=======
->>>>>>> Stashed changes
          )
 
 
@@ -276,14 +273,9 @@ def generate_launch_description():
     )
 
     return LaunchDescription(
-<<<<<<< Updated upstream
-        [
-             
-=======
         [   
             ign_gazebo,
             robot_state_publisher,
->>>>>>> Stashed changes
             static_tf,
             robot_state_publisher,
             ign_gazebo,
