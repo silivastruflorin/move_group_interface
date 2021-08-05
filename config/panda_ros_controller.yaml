@@ -1,6 +1,10 @@
 controller_names:
   - ur5_controller
+<<<<<<< Updated upstream
   # - panda_hand_controller
+=======
+  - hand_controller
+>>>>>>> Stashed changes
 
 ur5_controller:
   action_ns: follow_joint_trajectory
@@ -13,6 +17,7 @@ ur5_controller:
    - wrist_1_joint
    - wrist_2_joint
    - wrist_3_joint
+<<<<<<< Updated upstream
 
 # panda_hand_controller:
 #   action_ns: gripper_cmd
@@ -20,3 +25,12 @@ ur5_controller:
 #   default: true
 #   joints:
 #     - panda_finger_joint1
+=======
+hand_controller:
+  action_ns: follow_joint_trajectory
+  type: FollowJointTrajectory
+  default: true
+  joints:
+   - rg2_finger_joint1
+   - rg2_finger_joint2
+>>>>>>> Stashed changes
