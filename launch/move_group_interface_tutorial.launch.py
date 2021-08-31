@@ -55,7 +55,9 @@ def generate_launch_description():
         executable="move_group_interface_tutorial_exe",
         prefix="xterm -e",
         output="screen",
-        parameters=[robot_description, robot_description_semantic, kinematics_yaml,{'use_sim_time': use_sim_time},],
+        parameters=[robot_description, robot_description_semantic, kinematics_yaml,
+        # {'use_sim_time': use_sim_time},
+        ],
         remappings=[("/move_group_interface_node_name_space/joint_states","/joint_states")],
     )
 
